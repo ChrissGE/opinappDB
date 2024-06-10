@@ -381,6 +381,7 @@ def getQuestionary():
 
             """
             cursor.execute(sql_query, (language_code,company_code))
+            print(language_code,company_code)
             rows = cursor.fetchall()
             print(rows)
             if not rows:
