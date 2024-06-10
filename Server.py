@@ -193,14 +193,31 @@ def getCompanies():
         conn = create_connection()
         cursor = conn.cursor()
         query = """ WITH ranked_scores AS (
-                        SELECT  c.company_name, c.company_code, c.address, c.coords, COALESCE(gsv.mark, -1.00) AS mark, 
-                                ROW_NUMBER() OVER (PARTITION BY c.company_code ORDER BY gsv.id_global_scoring_value DESC) AS rank
-                        FROM company c
-                        LEFT JOIN global_scorings_value gsv ON gsv.company_code = c.company_code
+                        SELECT  
+                            c.company_name, 
+                            c.company_code, 
+                            c.address, 
+                            c.coords, 
+                            COALESCE(gsv.mark, -1.00) AS mark, 
+                            ROW_NUMBER() OVER (PARTITION BY c.company_code ORDER BY gsv.mark DESC) AS row_num
+                        FROM 
+                            company c
+                        LEFT JOIN 
+                            global_scorings_value gsv 
+                        ON 
+                            gsv.company_code = c.company_code
                     )
-                    SELECT company_name, company_code, address, coords, mark
-                    FROM ranked_scores
-                    WHERE rank = 1;
+                    SELECT 
+                        company_name, 
+                        company_code, 
+                        address, 
+                        coords, 
+                        mark
+                    FROM 
+                        ranked_scores
+                    WHERE 
+                        row_num = 1;
+
                     """
         cursor.execute(query)
         rows = cursor.fetchall()
