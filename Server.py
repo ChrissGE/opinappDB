@@ -699,16 +699,16 @@ def calculate_score_perReview(idReview):
         rows = cursor.fetchall()
         scores_mapQuestionary = {}
         for row in rows:
-            if row.answer_value==row.binary_answer:
-                if row.id_questionaryMenu in scores_mapQuestionary:
-                    scores_mapQuestionary[row.id_questionaryMenu]+=row.score_value
+            if row[0]==row[1]:
+                if row[2] in scores_mapQuestionary:
+                    scores_mapQuestionary[row[2]]+=row[3]
                 else:
-                    scores_mapQuestionary[row.id_questionaryMenu]=row.score_value
+                    scores_mapQuestionary[row[2]]=row[3]
             else:
-                if row.id_questionaryMenu in scores_mapQuestionary:
-                    scores_mapQuestionary[row.id_questionaryMenu]+=0
+                if row[2] in scores_mapQuestionary:
+                    scores_mapQuestionary[row[2]]+=0
                 else:
-                    scores_mapQuestionary[row.id_questionaryMenu]=0
+                    scores_mapQuestionary[row[2]]=0
         for id_mapQuestionary, score in scores_mapQuestionary.items():
             insert = """insert into scoring_per_map_review(id_review,id_questionaryMenu,mark) values(%s,%s,%s)"""
             cursor.execute(insert,(idReview,id_mapQuestionary,score))
