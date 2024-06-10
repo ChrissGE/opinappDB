@@ -1,6 +1,4 @@
-import base64
-import pandas as pd
-import pyodbc as odbc
+
 from flask import Flask, request, jsonify, send_file
 import nltk
 from nltk.sentiment import SentimentIntensityAnalyzer
