@@ -690,7 +690,7 @@ def calculate_score_perReview(idReview):
         conn = create_connection()
         cursor = conn.cursor()
         sql_query = """
-            select answer_value,binary_answer,id_questionaryMenu,score_value
+            select answer_value,binary_answer,a.id_questionaryMenu,score_value
             from question_condition qc
             inner join answer a on a.id_questions=qc.id_questions and a.id_questionaryMenu=qc.id_questionaryMenu
             where id_review = %s
