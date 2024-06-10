@@ -318,8 +318,11 @@ def getQuestionary():
 
         cursor = conn.cursor()
         try:
-            sql_query = """
-              SET @language = '{language_code}';
+            sql_query = f"""
+              use opinapp;
+
+                SET @language = '{language_code}';
+
                 WITH RECURSIVE TextQuestions AS (
                     SELECT 
                         mtq.id_questions, 
@@ -327,15 +330,14 @@ def getQuestionary():
                         qt.text,
                         ROW_NUMBER() OVER (PARTITION BY mtq.id_questions ORDER BY 
                             CASE 
-                                WHEN l.name_language = 'ES' THEN 1
-                                WHEN l.name_language = 'EN' THEN 2
-                                WHEN l.name_language = 'PT' THEN 3
-                                ELSE 4
+                                WHEN  @language  THEN CASE WHEN l.name_language = 'ES' THEN 1 ELSE 2 END
+                                WHEN  @language  THEN CASE WHEN l.name_language = 'EN' THEN 1 ELSE 2 END
+                                WHEN  @language  THEN CASE WHEN l.name_language = 'PT' THEN 1 ELSE 2 END
+                                ELSE 2
                             END) AS rn
                     FROM mapTextQuestions mtq
                     LEFT JOIN texts qt ON mtq.id_text = qt.id_text
                     LEFT JOIN languages l ON qt.id_language = l.id_language
-                    WHERE l.name_language = @language -- Utilizar el parámetro language_code
                 ),
                 FilteredTextQuestions AS (
                     SELECT id_questions, id_text, text
@@ -349,15 +351,14 @@ def getQuestionary():
                         tm.text,
                         ROW_NUMBER() OVER (PARTITION BY mtm.id_questionaryMenu ORDER BY 
                             CASE 
-                                WHEN l.name_language = 'ES' THEN 1
-                                WHEN l.name_language = 'EN' THEN 2
-                                WHEN l.name_language = 'PT' THEN 3
-                                ELSE 4
+                                WHEN  @language  THEN CASE WHEN l.name_language = 'ES' THEN 1 ELSE 2 END
+                                WHEN  @language  THEN CASE WHEN l.name_language = 'EN' THEN 1 ELSE 2 END
+                                WHEN  @language  THEN CASE WHEN l.name_language = 'PT' THEN 1 ELSE 2 END
+                                ELSE 2
                             END) AS rn
                     FROM mapTextMenu mtm
                     LEFT JOIN texts tm ON mtm.id_text = tm.id_text
                     LEFT JOIN languages l ON tm.id_language = l.id_language
-                    WHERE l.name_language = @language -- Utilizar el parámetro language_code
                 ),
                 FilteredTextMenus AS (
                     SELECT id_questionaryMenu, id_text, text
@@ -380,6 +381,7 @@ def getQuestionary():
                 INNER JOIN questionaries qn ON qn.id_questionary = qm.id_questionary
                 INNER JOIN company c ON qn.company_code = c.company_code
                 WHERE qn.company_code = '{company_code}';
+
 
             """
             cursor.execute(sql_query)
