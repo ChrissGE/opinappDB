@@ -283,11 +283,11 @@ def get_image():
         cursor = conn.cursor()
         if tipo == 'producto':
             query = "SELECT image_reward FROM rewards WHERE id_reward = %s"
-            filename = f"r./imagenes/star.png"
+            filename = f"./opinappDB/imagenes/star.png"
 
         elif tipo == 'company':
             query = "SELECT image_company FROM company WHERE company_code = %s"
-            filename = f"r.//imagenes/star.png"
+            filename = f"./opinappDB/imagenes/star.png"
 
         # cursor.execute(query, (id_image,))
         # row = cursor.fetchone()
