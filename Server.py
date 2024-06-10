@@ -377,9 +377,7 @@ def getQuestionary():
                         LEFT JOIN texts tm_default ON ftm.id_text = tm_default.id_text
                         INNER JOIN questionaries qn ON qn.id_questionary = qm.id_questionary
                         INNER JOIN company c ON qn.company_code = c.company_code
-                        WHERE qn.company_code = 'U31477490';
-                        """
-            sql_query = """source ..//opinappDB/consulta.sql"""
+                        WHERE qn.company_code = 'U31477490';"""
             cursor.execute(sql_query)
             print(language_code,company_code)
             rows = cursor.fetchall()
