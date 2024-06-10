@@ -39,8 +39,6 @@ def toVarBinary(image_path, id, image_type, query):
         cursor = conn.cursor()
         cursor.execute(query, (image_bytes, id))
         conn.commit()
-    except mysql.Error as e:
-        print("Error al ejecutar la consulta:", e)
     finally:
         # Cierra la conexión
         cursor.close()
