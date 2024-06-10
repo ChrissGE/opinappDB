@@ -695,7 +695,7 @@ def calculate_score_perReview(idReview):
             inner join answer a on a.id_questions=qc.id_questions and a.id_questionaryMenu=qc.id_questionaryMenu
             where id_review = %s
         """
-        cursor.execute(sql_query, idReview)
+        cursor.execute(sql_query, (idReview))
         rows = cursor.fetchall()
         scores_mapQuestionary = {}
         for row in rows:
@@ -802,7 +802,7 @@ def setReview():
         cursor.execute(insert_traces, (company_code, company_code))
         
         conn.commit()
-        #calculate_score_perReview(id_review)
+        calculate_score_perReview(id_review)
         return jsonify({"message": "Review creada exitosamente", "points_reward": points_reward})
     
     finally:
