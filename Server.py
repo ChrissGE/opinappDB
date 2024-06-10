@@ -318,7 +318,8 @@ def getQuestionary():
 
         cursor = conn.cursor()
         try:
-            sql_query ="""SET @language = 'ES';
+            sql_query ="""USE opinapp;
+                        SET @language = 'ES';
 
                         WITH RECURSIVE TextQuestions AS (
                             SELECT 
