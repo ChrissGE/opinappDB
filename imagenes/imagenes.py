@@ -1,6 +1,6 @@
 from PIL import Image
 import io
-import mysql.connector as mysql
+import mysql.connector
 
 config = {
   'user': 'root',
