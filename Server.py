@@ -389,7 +389,7 @@ def getQuestionary():
             rows = cursor.fetchall()
             print(rows)
             if not rows:
-                return jsonify({"error": "No se encontraron registros para el email proporcionado"}), 500
+                return jsonify({"error": sql_query}), 500
             results = [
                 {description[0]: row[i] for i, description in enumerate(cursor.description)}for row in rows
             ]
