@@ -382,12 +382,11 @@ def getQuestionary():
             print(language_code,company_code)
             rows = cursor.fetchall()
             print(rows)
-            if not rows:
-                return jsonify({"error": sql_query}), 500
+            
             results = [
                 {description[0]: row[i] for i, description in enumerate(cursor.description)}for row in rows
             ]
-          
+            
             return jsonify(results)
  
         finally:
