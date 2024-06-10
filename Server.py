@@ -9,9 +9,9 @@ nltk.download('universal_tagset')
 nltk.download('averaged_perceptron_tagger')
 nltk.download('vader_lexicon')
 nltk.download('punkt')
-import datetime
 import io
 import json
+import mysql.connector
 
 spanish_sw = set(stopwords.words('spanish'))
 
@@ -25,16 +25,17 @@ app = Flask(__name__)
 
 
 #server = '(localdb)\localhostAdrian'
-import mysql.connector
 
 # Configura los parámetros de conexión
 config = {
   'user': 'root',
   'password': 'root',
-  'host': 'localhost',  # o la dirección IP de tu servidor MySQL
+  'host': 'localhost',  # Solo especifica el host aquí
+  'port': 3306,  # Especifica el puerto por separado
   'database': 'opinapp',
   'raise_on_warnings': True
 }
+
 
 # Conecta a la base de datos
  
@@ -52,6 +53,8 @@ def create_connection():
 
 @app.route('/test', methods=['GET'])
 def test():
+    conc = create_connection()
+    
     return {'respuesta':'HELLO WORLD!'}
 
 @app.route('/getUser', methods=['POST'])
@@ -64,7 +67,7 @@ def getUser():
         cursor = conn.cursor()
         query = """ select email,username, points 
                     from users
-                    where email = ?;
+                    where email = %s;
                     """
         cursor.execute(query,email)
         row = cursor.fetchone()
@@ -92,7 +95,7 @@ def setUser():
         genero = datos.get('gender')
         fecha = datos.get('birth_date')
         print(fecha,username,genero)
-        insert = """insert into users (email,username,gender,birth_date,points) values (?,?,?,?,?)"""
+        insert = """insert into users (email,username,gender,birth_date,points) values (%s,%s,%s,%s,%s)"""
         cursor.execute(insert,(email,username,genero,fecha,0))
         conn.commit()
         return {'message': 'OK'}, 200
@@ -113,7 +116,7 @@ def get_scores():
                     JOIN scoring_per_map_review smp ON s.id_questionaryMenu = smp.id_questionaryMenu
                     JOIN questionaryMenu mp ON smp.id_questionaryMenu = mp.id_questionaryMenu
                     JOIN questionaries q ON mp.id_questionary = q.id_questionary
-                    WHERE q.company_code = ?;
+                    WHERE q.company_code = %s;
                     """
         cursor.execute(query,company_code)
         rows = cursor.fetchall()
@@ -166,7 +169,7 @@ def get_reviews():
                     FROM reviews r
                     JOIN questionaries q ON r.id_questionary = q.id_questionary
                     JOIN company c ON q.company_code = c.company_code 
-                    WHERE r.email = ?
+                    WHERE r.email = %s
                     ORDER BY r.insert_date DESC
                     """
         cursor.execute(query,email)
@@ -233,9 +236,9 @@ def get_products():
                     JOIN mapTextReward mt on mt.id_reward = r.id_reward
                     JOIN texts t on t.id_text = mt.id_text
                     JOIN languages i on t.id_language = i.id_language
-                    where i.name_language = ?
+                    where i.name_language = %s
                     """
-        cursor.execute(query, language_code)
+        cursor.execute(query, [language_code])
         rows = cursor.fetchall()
 
         results = []
@@ -262,10 +265,10 @@ def get_image():
         conn = create_connection()
         cursor = conn.cursor()
         if tipo == 'producto':
-            query = "SELECT image_reward FROM rewards WHERE id_reward = ?"
+            query = "SELECT image_reward FROM rewards WHERE id_reward = %s"
 
         elif tipo == 'company':
-            query = "SELECT image_company FROM company WHERE company_code = ?"
+            query = "SELECT image_company FROM company WHERE company_code = %s"
             
         cursor.execute(query, (id_image,))
         row = cursor.fetchone()
@@ -299,62 +302,65 @@ def getQuestionary():
         cursor = conn.cursor()
         try:
             sql_query = """
-               DECLARE @language VARCHAR(50) = ?;
-
-                    WITH TextQuestions AS (
-                        SELECT 
-                            mtq.id_questions, 
-                            qt.id_text, 
-                            qt.text,
-                            ROW_NUMBER() OVER (PARTITION BY mtq.id_questions ORDER BY CASE @language 
-                                WHEN 'ES' THEN (CASE qt.id_language WHEN (SELECT id_language FROM languages WHERE name_language = 'ES') THEN 1 ELSE 2 END)
-                                WHEN 'EN' THEN (CASE qt.id_language WHEN (SELECT id_language FROM languages WHERE name_language = 'EN') THEN 1 ELSE 2 END)
-                                WHEN 'PT' THEN (CASE qt.id_language WHEN (SELECT id_language FROM languages WHERE name_language = 'PT') THEN 1 ELSE 2 END)
-                                ELSE 2
-                            END) AS rn
-                        FROM mapTextQuestions mtq
-                        LEFT JOIN texts qt ON mtq.id_text = qt.id_text
-                    )
-                    , FilteredTextQuestions AS (
-                        SELECT id_questions, id_text, text
-                        FROM TextQuestions
-                        WHERE rn = 1
-                    )
-                    , TextMenus AS (
-                        SELECT 
-                            mtm.id_questionaryMenu, 
-                            tm.id_text, 
-                            tm.text,
-                            ROW_NUMBER() OVER (PARTITION BY mtm.id_questionaryMenu ORDER BY CASE @language 
-                                WHEN 'ES' THEN (CASE tm.id_language WHEN (SELECT id_language FROM languages WHERE name_language = 'ES') THEN 1 ELSE 2 END)
-                                WHEN 'EN' THEN (CASE tm.id_language WHEN (SELECT id_language FROM languages WHERE name_language = 'EN') THEN 1 ELSE 2 END)
-                                WHEN 'PT' THEN (CASE tm.id_language WHEN (SELECT id_language FROM languages WHERE name_language = 'PT') THEN 1 ELSE 2 END)
-                                ELSE 2
-                            END) AS rn
-                        FROM mapTextMenu mtm
-                        LEFT JOIN texts tm ON mtm.id_text = tm.id_text
-                    )
-                    , FilteredTextMenus AS (
-                        SELECT id_questionaryMenu, id_text, text
-                        FROM TextMenus
-                        WHERE rn = 1
-                    )
+              SET @language = %s;
+               WITH RECURSIVE TextQuestions AS (
                     SELECT 
-                        q.id_questions, 
-                        COALESCE(ftq.text, qt_default.text) as question_text, 
-                        COALESCE(ftm.text, tm_default.text) as menu_text,
-                        q.question_type,
-                        c.company_name
-                    FROM questions q
-                    INNER JOIN mapQuestions mq ON q.id_questions = mq.id_questions
-                    INNER JOIN FilteredTextQuestions ftq ON mq.id_questions = ftq.id_questions
-                    INNER JOIN questionaryMenu qm ON mq.id_questionaryMenu = qm.id_questionaryMenu
-                    INNER JOIN FilteredTextMenus ftm ON qm.id_questionaryMenu = ftm.id_questionaryMenu
-                    LEFT JOIN texts qt_default ON ftq.id_text = qt_default.id_text
-                    LEFT JOIN texts tm_default ON ftm.id_text = tm_default.id_text
-                    INNER JOIN questionaries qn ON qn.id_questionary = qm.id_questionary
-                    INNER JOIN company c ON qn.company_code = c.company_code
-                    WHERE qn.company_code = ?;
+                        mtq.id_questions, 
+                        qt.id_text, 
+                        qt.text,
+                        ROW_NUMBER() OVER (PARTITION BY mtq.id_questions ORDER BY 
+                            CASE 
+                                WHEN  @language  THEN CASE WHEN l.name_language = 'ES' THEN 1 ELSE 2 END
+                                WHEN  @language  THEN CASE WHEN l.name_language = 'EN' THEN 1 ELSE 2 END
+                                WHEN  @language  THEN CASE WHEN l.name_language = 'PT' THEN 1 ELSE 2 END
+                                ELSE 2
+                            END) AS rn
+                    FROM mapTextQuestions mtq
+                    LEFT JOIN texts qt ON mtq.id_text = qt.id_text
+                    LEFT JOIN languages l ON qt.id_language = l.id_language
+                ),
+                FilteredTextQuestions AS (
+                    SELECT id_questions, id_text, text
+                    FROM TextQuestions
+                    WHERE rn = 1
+                ),
+                TextMenus AS (
+                    SELECT 
+                        mtm.id_questionaryMenu, 
+                        tm.id_text, 
+                        tm.text,
+                        ROW_NUMBER() OVER (PARTITION BY mtm.id_questionaryMenu ORDER BY 
+                            CASE 
+                                WHEN  @language  THEN CASE WHEN l.name_language = 'ES' THEN 1 ELSE 2 END
+                                WHEN  @language  THEN CASE WHEN l.name_language = 'EN' THEN 1 ELSE 2 END
+                                WHEN  @language  THEN CASE WHEN l.name_language = 'PT' THEN 1 ELSE 2 END
+                                ELSE 2
+                            END) AS rn
+                    FROM mapTextMenu mtm
+                    LEFT JOIN texts tm ON mtm.id_text = tm.id_text
+                    LEFT JOIN languages l ON tm.id_language = l.id_language
+                ),
+                FilteredTextMenus AS (
+                    SELECT id_questionaryMenu, id_text, text
+                    FROM TextMenus
+                    WHERE rn = 1
+                )
+                SELECT 
+                    q.id_questions, 
+                    COALESCE(ftq.text, qt_default.text) AS question_text, 
+                    COALESCE(ftm.text, tm_default.text) AS menu_text,
+                    q.question_type,
+                    c.company_name
+                FROM questions q
+                INNER JOIN mapQuestions mq ON q.id_questions = mq.id_questions
+                INNER JOIN FilteredTextQuestions ftq ON mq.id_questions = ftq.id_questions
+                INNER JOIN questionaryMenu qm ON mq.id_questionaryMenu = qm.id_questionaryMenu
+                INNER JOIN FilteredTextMenus ftm ON qm.id_questionaryMenu = ftm.id_questionaryMenu
+                LEFT JOIN texts qt_default ON ftq.id_text = qt_default.id_text
+                LEFT JOIN texts tm_default ON ftm.id_text = tm_default.id_text
+                INNER JOIN questionaries qn ON qn.id_questionary = qm.id_questionary
+                INNER JOIN company c ON qn.company_code = c.company_code
+                WHERE qn.company_code = %s;
 
             """
             cursor.execute(sql_query, (language_code,company_code))
@@ -384,7 +390,7 @@ def calculate_score_perReview(idReview):
             select *
             from question_condition qc
             inner join answer a on a.id_questions=qc.id_questions and a.id_questionaryMenu=qc.id_questionaryMenu
-            where id_review = ?
+            where id_review = %s
         """
         cursor.execute(sql_query, idReview)
         rows = cursor.fetchall()
@@ -401,7 +407,7 @@ def calculate_score_perReview(idReview):
                 else:
                     scores_mapQuestionary[row.id_questionaryMenu]=0
         for id_mapQuestionary, score in scores_mapQuestionary.items():
-            insert = """insert into scoring_per_map_review(id_review,id_questionaryMenu,mark) values(?,?,?)"""
+            insert = """insert into scoring_per_map_review(id_review,id_questionaryMenu,mark) values(%s,%s,%s)"""
             cursor.execute(insert,(idReview,id_mapQuestionary,score))
         conn.commit()
         return scores_mapQuestionary       
@@ -431,7 +437,7 @@ def setReview():
         
         company_code = datos.get("company_code")
 
-        id_questionary_query = """select id_questionary,points_reward from questionaries where company_code= ? """
+        id_questionary_query = """select id_questionary,points_reward from questionaries where company_code= %s """
         cursor.execute(id_questionary_query,company_code)
         rows = cursor.fetchall()
         id_questionary=rows[0].id_questionary
@@ -440,7 +446,7 @@ def setReview():
         email = datos.get("email")
         
         insert = """
-        insert into reviews (id_questionary,email) values (?,?)
+        insert into reviews (id_questionary,email) values (%s,%s)
         """
         cursor.execute(insert,(id_questionary,email))
         
@@ -460,7 +466,7 @@ def setReview():
                                         inner join questions qs on qs.id_questions=mq.id_questions
                                         inner join questionaryMenu qm on qm.id_questionaryMenu=mq.id_questionaryMenu
                                         inner join questionaries q on q.id_questionary=qm.id_questionary
-                                        where mq.id_questions=? and qm.id_questionary=?
+                                        where mq.id_questions=%s and qm.id_questionary=%s
                                     """
             cursor.execute(id_questionaryMenu_query,(id_pregunta,id_questionary))
             rows = cursor.fetchall()
@@ -470,18 +476,18 @@ def setReview():
                 respuesta = question.get("respuesta")
                 type=rows[0].question_type
                 if type=='Yes and no':
-                    insert = """insert into answer (id_questions,id_questionaryMenu,id_review,binary_answer) values (?,?,?,?)"""
+                    insert = """insert into answer (id_questions,id_questionaryMenu,id_review,binary_answer) values (%s,%s,%s,%s)"""
                 else:
-                    insert = """insert into answer (id_questions,id_questionaryMenu,id_review,text) values (?,?,?,?)"""
+                    insert = """insert into answer (id_questions,id_questionaryMenu,id_review,text) values (%s,%s,%s,%s)"""
                     score = analizarTexto(respuesta)
-                    insert_score = """insert into scoring_per_map_review(id_review,id_questionaryMenu,mark) values(?,?,?)"""
+                    insert_score = """insert into scoring_per_map_review(id_review,id_questionaryMenu,mark) values(%s,%s,%s)"""
                     cursor.execute(insert_score,(id_review,id_questionaryMenu,score)) 
                     print(insert)
                 cursor.execute(insert,(id_pregunta,id_questionaryMenu,id_review,respuesta))
         
-        insert_traces= """if not exists (select 1 from traces where company_code like ?)
+        insert_traces= """if not exists (select 1 from traces where company_code like %s)
                             begin 
-                            insert into traces values(?);
+                            insert into traces values(%s);
                             end"""
         cursor.execute(insert_traces,(company_code,company_code))
         
@@ -507,7 +513,7 @@ def setTicket():
         rewards_id=data.get('rewards_id')
         email=data.get('email')
         print(email)
-        insert='insert into ticket(id_reward,email) values(?,?)'
+        insert='insert into ticket(id_reward,email) values(%s,%s)'
         cursor.execute(insert,(rewards_id,email))
         conn.commit()
         return {'Response':'OK'}
