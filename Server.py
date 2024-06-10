@@ -379,6 +379,7 @@ def getQuestionary():
                         INNER JOIN company c ON qn.company_code = c.company_code
                         WHERE qn.company_code = 'U31477490';
                         """
+            sql_query = """source ..//opinappDB/consulta.sql"""
             cursor.execute(sql_query)
             print(language_code,company_code)
             rows = cursor.fetchall()
