@@ -312,366 +312,89 @@ def getQuestionary():
         name_language=datos.get('name_language')
 
         if name_language.lower()=='español':
-            if company_code =="U31477490":
-                results = [
-                                {
-                                    "id_questions": 13,
-                                    "question_text": "¿Consideras que la comida estaba fresca y bien preparada durante tu visita?",
-                                    "menu_text": "Calidad de la Comida",
-                                    "question_type": "Yes and no",
-                                    "company_name": "Ginos"
-                                },
-                                {
-                                    "id_questions": 14,
-                                    "question_text": "¿Te pareció que los ingredientes utilizados en los platos eran de alta calidad y sabrosos?",
-                                    "menu_text": "Calidad de la Comida",
-                                    "question_type": "Yes and no",
-                                    "company_name": "Ginos"
-                                },
-                                {
-                                    "id_questions": 15,
-                                    "question_text": "¿Sentiste que la atmósfera del restaurante era acogedora y agradable?",
-                                    "menu_text": "Experiencia en el Restaurante",
-                                    "question_type": "Yes and no",
-                                    "company_name": "Ginos"
-                                },
-                                {
-                                    "id_questions": 16,
-                                    "question_text": "¿La presentación de los platos y la decoración general del restaurante contribuyeron positivamente a tu experiencia?",
-                                    "menu_text": "Experiencia en el Restaurante",
-                                    "question_type": "Yes and no",
-                                    "company_name": "Ginos"
-                                },
-                                {
-                                    "id_questions": 17,
-                                    "question_text": "¿Crees que el precio de los platos estaba justificado por la calidad y cantidad de comida que recibiste?",
-                                    "menu_text": "Valor por el Dinero",
-                                    "question_type": "Yes and no",
-                                    "company_name": "Ginos"
-                                },
-                                {
-                                    "id_questions": 18,
-                                    "question_text": "¿Consideras que la relación calidad-precio en Ginos es favorable comparada con otros restaurantes de comida italiana en la zona?",
-                                    "menu_text": "Valor por el Dinero",
-                                    "question_type": "Yes and no",
-                                    "company_name": "Ginos"
-                                },
-                                {
-                                    "id_questions": 19,
-                                    "question_text": "¿Hay algún comentario adicional que te gustaría compartir sobre tu experiencia con el servicio del personal en Ginos Restaurante?",
-                                    "menu_text": "Servicio del Personal",
-                                    "question_type": "Text",
-                                    "company_name": "Ginos"
-                                }
-                            ]
-            elif company_code =="E73463259":
-                results=[
-                        {
-                            "id_questions": 1,
-                            "question_text": "¿Encontraste fácilmente los productos que estabas buscando?",
-                            "menu_text": "Experiencia de Compra",
-                            "question_type": "Yes and no",
-                            "company_name": "Kiabi"
-                        },
-                        {
-                            "id_questions": 2,
-                            "question_text": "¿Estaba la tienda bien organizada y limpia?",
-                            "menu_text": "Experiencia de Compra",
-                            "question_type": "Yes and no",
-                            "company_name": "Kiabi"
-                        },
-                        {
-                            "id_questions": 3,
-                            "question_text": "¿Había una buena disponibilidad de tallas y estilos?",
-                            "menu_text": "Experiencia de Compra",
-                            "question_type": "Yes and no",
-                            "company_name": "Kiabi"
-                        },
-                        {
-                            "id_questions": 4,
-                            "question_text": "¿Estabas satisfecho con la rapidez en el proceso de pago?",
-                            "menu_text": "Experiencia de Compra",
-                            "question_type": "Yes and no",
-                            "company_name": "Kiabi"
-                        },
-                        {
-                            "id_questions": 5,
-                            "question_text": "¿Estás satisfecho con la calidad de los materiales de la ropa?",
-                            "menu_text": "Calidad de los Productos",
-                            "question_type": "Yes and no",
-                            "company_name": "Kiabi"
-                        },
-                        {
-                            "id_questions": 6,
-                            "question_text": "¿Consideras que las tallas son precisas y consistentes?",
-                            "menu_text": "Calidad de los Productos",
-                            "question_type": "Yes and no",
-                            "company_name": "Kiabi"
-                        },
-                        {
-                            "id_questions": 7,
-                            "question_text": "¿La ropa que compraste ha mantenido su forma y color después de lavarla?",
-                            "menu_text": "Calidad de los Productos",
-                            "question_type": "Yes and no",
-                            "company_name": "Kiabi"
-                        },
-                        {
-                            "id_questions": 8,
-                            "question_text": "¿Estás contento con la variedad de estilos disponibles en la tienda?",
-                            "menu_text": "Calidad de los Productos",
-                            "question_type": "Yes and no",
-                            "company_name": "Kiabi"
-                        },
-                        {
-                            "id_questions": 9,
-                            "question_text": "¿Fuiste atendido de manera amable y cortés por el personal?",
-                            "menu_text": "Servicio al Cliente",
-                            "question_type": "Yes and no",
-                            "company_name": "Kiabi"
-                        },
-                        {
-                            "id_questions": 10,
-                            "question_text": "¿El personal estuvo disponible para ayudarte cuando lo necesitaste?",
-                            "menu_text": "Servicio al Cliente",
-                            "question_type": "Yes and no",
-                            "company_name": "Kiabi"
-                        },
-                        {
-                            "id_questions": 11,
-                            "question_text": "¿El personal pudo responder a tus preguntas sobre los productos?",
-                            "menu_text": "Servicio al Cliente",
-                            "question_type": "Yes and no",
-                            "company_name": "Kiabi"
-                        },
-                        {
-                            "id_questions": 12,
-                            "question_text": "¿Estás satisfecho con la resolución de cualquier problema o inquietud que tuviste?",
-                            "menu_text": "Servicio al Cliente",
-                            "question_type": "Yes and no",
-                            "company_name": "Kiabi"
-                        }
-                    ]
-
+            language_code="ES"
         else:
-            if company_code == "U31477490":
-                results =[
-                        {
-                            "id_questions": 13,
-                            "question_text": "Did you find the food fresh and well-prepared during your visit?",
-                            "menu_text": "Food Quality",
-                            "question_type": "Yes and no",
-                            "company_name": "Ginos"
-                        },
-                        {
-                            "id_questions": 14,
-                            "question_text": "Did you find the ingredients used in the dishes to be of high quality and tasty?",
-                            "menu_text": "Food Quality",
-                            "question_type": "Yes and no",
-                            "company_name": "Ginos"
-                        },
-                        {
-                            "id_questions": 15,
-                            "question_text": "Did you feel that the atmosphere of the restaurant was cozy and pleasant?",
-                            "menu_text": "Restaurant Experience",
-                            "question_type": "Yes and no",
-                            "company_name": "Ginos"
-                        },
-                        {
-                            "id_questions": 16,
-                            "question_text": "Did the presentation of the dishes and the overall restaurant decor positively contribute to your experience?",
-                            "menu_text": "Restaurant Experience",
-                            "question_type": "Yes and no",
-                            "company_name": "Ginos"
-                        },
-                        {
-                            "id_questions": 17,
-                            "question_text": "Did you feel that the price of the dishes was justified by the quality and quantity of food you received?",
-                            "menu_text": "Value for Money",
-                            "question_type": "Yes and no",
-                            "company_name": "Ginos"
-                        },
-                        {
-                            "id_questions": 18,
-                            "question_text": "Do you consider Ginos’ value for money to be favorable compared to other Italian restaurants in the area?",
-                            "menu_text": "Value for Money",
-                            "question_type": "Yes and no",
-                            "company_name": "Ginos"
-                        },
-                        {
-                            "id_questions": 19,
-                            "question_text": "Is there any additional feedback you would like to share about your experience with the service of the staff at Ginos Restaurant?",
-                            "menu_text": "Staff Service",
-                            "question_type": "Text",
-                            "company_name": "Ginos"
-                        }
-                    ]
-
-            elif company_code =="E73463259":
-                results=[
-                        {
-                            "id_questions": 1,
-                            "question_text": "Did you easily find the products you were looking for?",
-                            "menu_text": "Experiencia de Compra",
-                            "question_type": "Yes and no",
-                            "company_name": "Kiabi"
-                        },
-                        {
-                            "id_questions": 2,
-                            "question_text": "¿Estaba la tienda bien organizada y limpia?",
-                            "menu_text": "Experiencia de Compra",
-                            "question_type": "Yes and no",
-                            "company_name": "Kiabi"
-                        },
-                        {
-                            "id_questions": 3,
-                            "question_text": "Was there good availability of sizes and styles?",
-                            "menu_text": "Experiencia de Compra",
-                            "question_type": "Yes and no",
-                            "company_name": "Kiabi"
-                        },
-                        {
-                            "id_questions": 4,
-                            "question_text": "¿Estabas satisfecho con la rapidez en el proceso de pago?",
-                            "menu_text": "Experiencia de Compra",
-                            "question_type": "Yes and no",
-                            "company_name": "Kiabi"
-                        },
-                        {
-                            "id_questions": 5,
-                            "question_text": "Are you satisfied with the quality of the clothing materials?",
-                            "menu_text": "Product Quality",
-                            "question_type": "Yes and no",
-                            "company_name": "Kiabi"
-                        },
-                        {
-                            "id_questions": 6,
-                            "question_text": "¿Consideras que las tallas son precisas y consistentes?",
-                            "menu_text": "Product Quality",
-                            "question_type": "Yes and no",
-                            "company_name": "Kiabi"
-                        },
-                        {
-                            "id_questions": 7,
-                            "question_text": "Has the clothing you bought maintained its shape and color after washing?",
-                            "menu_text": "Product Quality",
-                            "question_type": "Yes and no",
-                            "company_name": "Kiabi"
-                        },
-                        {
-                            "id_questions": 8,
-                            "question_text": "¿Estás contento con la variedad de estilos disponibles en la tienda?",
-                            "menu_text": "Product Quality",
-                            "question_type": "Yes and no",
-                            "company_name": "Kiabi"
-                        },
-                        {
-                            "id_questions": 9,
-                            "question_text": "Were you attended to in a friendly and courteous manner by the staff?",
-                            "menu_text": "Servicio al Cliente",
-                            "question_type": "Yes and no",
-                            "company_name": "Kiabi"
-                        },
-                        {
-                            "id_questions": 10,
-                            "question_text": "¿El personal estuvo disponible para ayudarte cuando lo necesitaste?",
-                            "menu_text": "Servicio al Cliente",
-                            "question_type": "Yes and no",
-                            "company_name": "Kiabi"
-                        },
-                        {
-                            "id_questions": 11,
-                            "question_text": "Could the staff answer your questions about the products?",
-                            "menu_text": "Servicio al Cliente",
-                            "question_type": "Yes and no",
-                            "company_name": "Kiabi"
-                        },
-                        {
-                            "id_questions": 12,
-                            "question_text": "¿Estás satisfecho con la resolución de cualquier problema o inquietud que tuviste?",
-                            "menu_text": "Servicio al Cliente",
-                            "question_type": "Yes and no",
-                            "company_name": "Kiabi"
-                        }
-                    ]
-
-                
+            language_code="EN"
 
         cursor = conn.cursor()
         try:
-        #     sql_query = f"""
-        #       use opinapp;
-        #         WITH RECURSIVE Language AS (
-        #             SELECT 'ES' AS language_code
-        #         ),
-        #         TextQuestions AS (
-        #             SELECT 
-        #                 mtq.id_questions, 
-        #                 qt.id_text, 
-        #                 qt.text,
-        #                 ROW_NUMBER() OVER (PARTITION BY mtq.id_questions ORDER BY 
-        #                     CASE 
-        #                         WHEN l.name_language = Language.language_code THEN 1
-        #                         ELSE 2
-        #                     END) AS rn
-        #             FROM mapTextQuestions mtq
-        #             LEFT JOIN texts qt ON mtq.id_text = qt.id_text
-        #             LEFT JOIN languages l ON qt.id_language = l.id_language
-        #             CROSS JOIN Language
-        #         ),
-        #         FilteredTextQuestions AS (
-        #             SELECT id_questions, id_text, text
-        #             FROM TextQuestions
-        #             WHERE rn = 1
-        #         ),
-        #         TextMenus AS (
-        #             SELECT 
-        #                 mtm.id_questionaryMenu, 
-        #                 tm.id_text, 
-        #                 tm.text,
-        #                 ROW_NUMBER() OVER (PARTITION BY mtm.id_questionaryMenu ORDER BY 
-        #                     CASE 
-        #                         WHEN l.name_language = Language.language_code THEN 1
-        #                         ELSE 2
-        #                     END) AS rn
-        #             FROM mapTextMenu mtm
-        #             LEFT JOIN texts tm ON mtm.id_text = tm.id_text
-        #             LEFT JOIN languages l ON tm.id_language = l.id_language
-        #             CROSS JOIN Language
-        #         ),
-        #         FilteredTextMenus AS (
-        #             SELECT id_questionaryMenu, id_text, text
-        #             FROM TextMenus
-        #             WHERE rn = 1
-        #         )
-        #         SELECT 
-        #             q.id_questions, 
-        #             COALESCE(ftq.text, qt_default.text) AS question_text, 
-        #             COALESCE(ftm.text, tm_default.text) AS menu_text,
-        #             q.question_type,
-        #             c.company_name
-        #         FROM questions q
-        #         INNER JOIN mapQuestions mq ON q.id_questions = mq.id_questions
-        #         INNER JOIN FilteredTextQuestions ftq ON mq.id_questions = ftq.id_questions
-        #         INNER JOIN questionaryMenu qm ON mq.id_questionaryMenu = qm.id_questionaryMenu
-        #         INNER JOIN FilteredTextMenus ftm ON qm.id_questionaryMenu = ftm.id_questionaryMenu
-        #         LEFT JOIN texts qt_default ON ftq.id_text = qt_default.id_text
-        #         LEFT JOIN texts tm_default ON ftm.id_text = tm_default.id_text
-        #         INNER JOIN questionaries qn ON qn.id_questionary = qm.id_questionary
-        #         INNER JOIN company c ON qn.company_code = c.company_code
-        #         WHERE qn.company_code = 'U31477490';
+            sql_query = f"""
+              use opinapp;
 
-        #     """
-        #     cursor.execute(sql_query)
-             print(name_language,company_code)
-        #     rows = cursor.fetchall()
-        #     print(rows)
-        #     if not rows:
-        #         return jsonify({"error": sql_query}), 500
-        #     results = [
-        #         {description[0]: row[i] for i, description in enumerate(cursor.description)}for row in rows
-        #     ]
+                SET @language = '{language_code}';
+
+                WITH RECURSIVE TextQuestions AS (
+                    SELECT 
+                        mtq.id_questions, 
+                        qt.id_text, 
+                        qt.text,
+                        ROW_NUMBER() OVER (PARTITION BY mtq.id_questions ORDER BY 
+                            CASE 
+                                WHEN  @language  THEN CASE WHEN l.name_language = 'ES' THEN 1 ELSE 2 END
+                                WHEN  @language  THEN CASE WHEN l.name_language = 'EN' THEN 1 ELSE 2 END
+                                WHEN  @language  THEN CASE WHEN l.name_language = 'PT' THEN 1 ELSE 2 END
+                                ELSE 2
+                            END) AS rn
+                    FROM mapTextQuestions mtq
+                    LEFT JOIN texts qt ON mtq.id_text = qt.id_text
+                    LEFT JOIN languages l ON qt.id_language = l.id_language
+                ),
+                FilteredTextQuestions AS (
+                    SELECT id_questions, id_text, text
+                    FROM TextQuestions
+                    WHERE rn = 1
+                ),
+                TextMenus AS (
+                    SELECT 
+                        mtm.id_questionaryMenu, 
+                        tm.id_text, 
+                        tm.text,
+                        ROW_NUMBER() OVER (PARTITION BY mtm.id_questionaryMenu ORDER BY 
+                            CASE 
+                                WHEN  @language  THEN CASE WHEN l.name_language = 'ES' THEN 1 ELSE 2 END
+                                WHEN  @language  THEN CASE WHEN l.name_language = 'EN' THEN 1 ELSE 2 END
+                                WHEN  @language  THEN CASE WHEN l.name_language = 'PT' THEN 1 ELSE 2 END
+                                ELSE 2
+                            END) AS rn
+                    FROM mapTextMenu mtm
+                    LEFT JOIN texts tm ON mtm.id_text = tm.id_text
+                    LEFT JOIN languages l ON tm.id_language = l.id_language
+                ),
+                FilteredTextMenus AS (
+                    SELECT id_questionaryMenu, id_text, text
+                    FROM TextMenus
+                    WHERE rn = 1
+                )
+                SELECT 
+                    q.id_questions, 
+                    COALESCE(ftq.text, qt_default.text) AS question_text, 
+                    COALESCE(ftm.text, tm_default.text) AS menu_text,
+                    q.question_type,
+                    c.company_name
+                FROM questions q
+                INNER JOIN mapQuestions mq ON q.id_questions = mq.id_questions
+                INNER JOIN FilteredTextQuestions ftq ON mq.id_questions = ftq.id_questions
+                INNER JOIN questionaryMenu qm ON mq.id_questionaryMenu = qm.id_questionaryMenu
+                INNER JOIN FilteredTextMenus ftm ON qm.id_questionaryMenu = ftm.id_questionaryMenu
+                LEFT JOIN texts qt_default ON ftq.id_text = qt_default.id_text
+                LEFT JOIN texts tm_default ON ftm.id_text = tm_default.id_text
+                INNER JOIN questionaries qn ON qn.id_questionary = qm.id_questionary
+                INNER JOIN company c ON qn.company_code = c.company_code
+                WHERE qn.company_code = '{company_code}';
+
+
+            """
+            cursor.execute(sql_query)
+            print(language_code,company_code)
+            rows = cursor.fetchall()
+            print(rows)
+            if not rows:
+                return jsonify({"error": sql_query}), 500
+            results = [
+                {description[0]: row[i] for i, description in enumerate(cursor.description)}for row in rows
+            ]
           
-             return results, 200
+            return jsonify(results)
  
         finally:
             cursor.close()
