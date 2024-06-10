@@ -319,7 +319,7 @@ def getQuestionary():
         cursor = conn.cursor()
         try:
             sql_query = """
-              SET @language = %s;
+              SET @language = '{language_code}';
                 WITH RECURSIVE TextQuestions AS (
                     SELECT 
                         mtq.id_questions, 
@@ -379,10 +379,10 @@ def getQuestionary():
                 LEFT JOIN texts tm_default ON ftm.id_text = tm_default.id_text
                 INNER JOIN questionaries qn ON qn.id_questionary = qm.id_questionary
                 INNER JOIN company c ON qn.company_code = c.company_code
-                WHERE qn.company_code = %s;
+                WHERE qn.company_code = '{company_code}';
 
             """
-            cursor.execute(sql_query, (language_code,company_code))
+            cursor.execute(sql_query)
             print(language_code,company_code)
             rows = cursor.fetchall()
             print(rows)
