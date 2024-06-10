@@ -172,7 +172,7 @@ def get_reviews():
                     WHERE r.email = %s
                     ORDER BY r.insert_date DESC
                     """
-        cursor.execute(query,email)
+        cursor.execute(query,(email,))
         rows = cursor.fetchall()
         results = [
             {
