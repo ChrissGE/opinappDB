@@ -1,7 +1,7 @@
 DELIMITER //
 
 CREATE TRIGGER trg_insertar_ticket 
-BEFORE OF INSERT ON ticket
+BEFORE INSERT ON ticket
 FOR EACH ROW
 BEGIN
     DECLARE points_act INT;
@@ -14,12 +14,12 @@ BEGIN
 
     SELECT rewards_price, stock INTO price, current_stock
     FROM rewards
-    WHERE id_reward = NEW.id_reward AND company_code = NEW.company_code;
+    WHERE id_reward = NEW.id_reward AND company_code = (SELECT company_code FROM company WHERE company_code = (SELECT company_code FROM rewards WHERE id_reward = NEW.id_reward));
 
     IF points_act >= price AND current_stock > 0 THEN
         UPDATE rewards 
         SET stock = stock - 1 
-        WHERE id_reward = NEW.id_reward AND company_code = NEW.company_code;
+        WHERE id_reward = NEW.id_reward AND company_code = (SELECT company_code FROM company WHERE company_code = (SELECT company_code FROM rewards WHERE id_reward = NEW.id_reward));
 
         UPDATE users 
         SET points = points - price 
