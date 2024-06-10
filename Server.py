@@ -365,7 +365,7 @@ def getQuestionary():
                                 }
                             ]
         else:
-            language_code="EN"
+            name_language="EN"
 
         cursor = conn.cursor()
         try:
@@ -433,7 +433,7 @@ def getQuestionary():
 
         #     """
         #     cursor.execute(sql_query)
-             print(language_code,company_code)
+             print(name_language,company_code)
         #     rows = cursor.fetchall()
         #     print(rows)
         #     if not rows:
@@ -442,7 +442,7 @@ def getQuestionary():
         #         {description[0]: row[i] for i, description in enumerate(cursor.description)}for row in rows
         #     ]
           
-        #     return jsonify(results)
+             return results, 200
  
         finally:
             cursor.close()
