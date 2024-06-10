@@ -118,7 +118,7 @@ def get_scores():
                     JOIN questionaries q ON mp.id_questionary = q.id_questionary
                     WHERE q.company_code = %s;
                     """
-        cursor.execute(query,company_code)
+        cursor.execute(query,(company_code,))
         rows = cursor.fetchall()
         results = [
             {description[0]: row[i] for i, description in enumerate(cursor.description)}for row in rows
