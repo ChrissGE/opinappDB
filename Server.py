@@ -27,14 +27,23 @@ app = Flask(__name__)
 
 
 #server = '(localdb)\localhostAdrian'
-server = '(localdb)\opinapp'
-database = 'OpinAppDB'
+import mysql.connector
 
+# Configura los parámetros de conexión
+config = {
+  'user': 'root',
+  'password': 'root',
+  'host': 'localhost',  # o la dirección IP de tu servidor MySQL
+  'database': 'opinapp',
+  'raise_on_warnings': True
+}
+
+# Conecta a la base de datos
  
 
 def create_connection():
     try:
-        conn = odbc.connect(Trusted_Connection='Yes',Driver='{ODBC Driver 17 for SQL Server}',Server=server,Database=database)
+        conn = mysql.connector.connect(**config)
         print("Conexión exitosa")
         return conn
     except Exception as e:
@@ -101,12 +110,12 @@ def get_scores():
         datos = request.json
         company_code = datos.get("company_code")
         cursor = conn.cursor()
-        query = """ select scoring_name,mark 
-                    from scorings s 
-                    join scoring_per_map_review smp on s.id_questionaryMenu = smp.id_questionaryMenu
-                    join questionaryMenu mp on smp.id_questionaryMenu = mp.id_questionaryMenu
-                    join questionaries q on mp.id_questionary = q.id_questionary
-                    where q.company_code = ?
+        query = """ SELECT s.scoring_name, smp.mark
+                    FROM scorings s 
+                    JOIN scoring_per_map_review smp ON s.id_questionaryMenu = smp.id_questionaryMenu
+                    JOIN questionaryMenu mp ON smp.id_questionaryMenu = mp.id_questionaryMenu
+                    JOIN questionaries q ON mp.id_questionary = q.id_questionary
+                    WHERE q.company_code = ?;
                     """
         cursor.execute(query,company_code)
         rows = cursor.fetchall()
@@ -155,11 +164,12 @@ def get_reviews():
         print(datos)
         email = datos.get("email")
         cursor = conn.cursor()
-        query = """ select FORMAT(r.insert_date, 'dd/MM/yyyy') AS insert_date, c.company_name, q.points_reward
-                    from reviews r join questionaries q on r.id_questionary=r.id_questionary
-                    join company c on q.company_code = c.company_code 
-                    where r.email = ?
-                    order by r.insert_date desc
+        query = """SELECT DATE_FORMAT(r.insert_date, '%d/%m/%Y') AS insert_date, c.company_name, q.points_reward
+                    FROM reviews r
+                    JOIN questionaries q ON r.id_questionary = q.id_questionary
+                    JOIN company c ON q.company_code = c.company_code 
+                    WHERE r.email = ?
+                    ORDER BY r.insert_date DESC
                     """
         cursor.execute(query,email)
         rows = cursor.fetchall()
@@ -182,11 +192,12 @@ def getCompanies():
         conn = create_connection()
         cursor = conn.cursor()
         query = """ WITH ranked_scores AS (
-                        SELECT  c.company_name, c.company_code,c.address,c.coords,coalesce(gsv.mark, -1.00) as mark, ROW_NUMBER() OVER (PARTITION BY c.company_code ORDER BY gsv.id_global_scoring_value DESC) AS rank
+                        SELECT  c.company_name, c.company_code, c.address, c.coords, COALESCE(gsv.mark, -1.00) AS mark, 
+                                ROW_NUMBER() OVER (PARTITION BY c.company_code ORDER BY gsv.id_global_scoring_value DESC) AS rank
                         FROM company c
                         LEFT JOIN global_scorings_value gsv ON gsv.company_code = c.company_code
                     )
-                    SELECT company_name,company_code,address,coords,mark
+                    SELECT company_name, company_code, address, coords, mark
                     FROM ranked_scores
                     WHERE rank = 1;
                     """
@@ -290,62 +301,63 @@ def getQuestionary():
         cursor = conn.cursor()
         try:
             sql_query = """
-                DECLARE @language VARCHAR(50) = ?;
+               DECLARE @language VARCHAR(50) = ?;
 
-                WITH TextQuestions AS (
+                    WITH TextQuestions AS (
+                        SELECT 
+                            mtq.id_questions, 
+                            qt.id_text, 
+                            qt.text,
+                            ROW_NUMBER() OVER (PARTITION BY mtq.id_questions ORDER BY CASE @language 
+                                WHEN 'ES' THEN (CASE qt.id_language WHEN (SELECT id_language FROM languages WHERE name_language = 'ES') THEN 1 ELSE 2 END)
+                                WHEN 'EN' THEN (CASE qt.id_language WHEN (SELECT id_language FROM languages WHERE name_language = 'EN') THEN 1 ELSE 2 END)
+                                WHEN 'PT' THEN (CASE qt.id_language WHEN (SELECT id_language FROM languages WHERE name_language = 'PT') THEN 1 ELSE 2 END)
+                                ELSE 2
+                            END) AS rn
+                        FROM mapTextQuestions mtq
+                        LEFT JOIN texts qt ON mtq.id_text = qt.id_text
+                    )
+                    , FilteredTextQuestions AS (
+                        SELECT id_questions, id_text, text
+                        FROM TextQuestions
+                        WHERE rn = 1
+                    )
+                    , TextMenus AS (
+                        SELECT 
+                            mtm.id_questionaryMenu, 
+                            tm.id_text, 
+                            tm.text,
+                            ROW_NUMBER() OVER (PARTITION BY mtm.id_questionaryMenu ORDER BY CASE @language 
+                                WHEN 'ES' THEN (CASE tm.id_language WHEN (SELECT id_language FROM languages WHERE name_language = 'ES') THEN 1 ELSE 2 END)
+                                WHEN 'EN' THEN (CASE tm.id_language WHEN (SELECT id_language FROM languages WHERE name_language = 'EN') THEN 1 ELSE 2 END)
+                                WHEN 'PT' THEN (CASE tm.id_language WHEN (SELECT id_language FROM languages WHERE name_language = 'PT') THEN 1 ELSE 2 END)
+                                ELSE 2
+                            END) AS rn
+                        FROM mapTextMenu mtm
+                        LEFT JOIN texts tm ON mtm.id_text = tm.id_text
+                    )
+                    , FilteredTextMenus AS (
+                        SELECT id_questionaryMenu, id_text, text
+                        FROM TextMenus
+                        WHERE rn = 1
+                    )
                     SELECT 
-                        mtq.id_questions, 
-                        qt.id_text, 
-                        qt.text,
-                        ROW_NUMBER() OVER (PARTITION BY mtq.id_questions ORDER BY CASE @language 
-                            WHEN 'ES' THEN (CASE qt.id_language WHEN (SELECT id_language FROM languages WHERE name_language = 'ES') THEN 1 ELSE 2 END)
-                            WHEN 'EN' THEN (CASE qt.id_language WHEN (SELECT id_language FROM languages WHERE name_language = 'EN') THEN 1 ELSE 2 END)
-                            WHEN 'PT' THEN (CASE qt.id_language WHEN (SELECT id_language FROM languages WHERE name_language = 'PT') THEN 1 ELSE 2 END)
-                            ELSE 2
-                        END) AS rn
-                    FROM mapTextQuestions mtq
-                    LEFT JOIN texts qt ON mtq.id_text = qt.id_text
-                )
-                , FilteredTextQuestions AS (
-                    SELECT id_questions, id_text, text
-                    FROM TextQuestions
-                    WHERE rn = 1
-                )
-                , TextMenus AS (
-                    SELECT 
-                        mtm.id_questionaryMenu, 
-                        tm.id_text, 
-                        tm.text,
-                        ROW_NUMBER() OVER (PARTITION BY mtm.id_questionaryMenu ORDER BY CASE @language 
-                            WHEN 'ES' THEN (CASE tm.id_language WHEN (SELECT id_language FROM languages WHERE name_language = 'ES') THEN 1 ELSE 2 END)
-                            WHEN 'EN' THEN (CASE tm.id_language WHEN (SELECT id_language FROM languages WHERE name_language = 'EN') THEN 1 ELSE 2 END)
-                            WHEN 'PT' THEN (CASE tm.id_language WHEN (SELECT id_language FROM languages WHERE name_language = 'PT') THEN 1 ELSE 2 END)
-                            ELSE 2
-                        END) AS rn
-                    FROM mapTextMenu mtm
-                    LEFT JOIN texts tm ON mtm.id_text = tm.id_text
-                )
-                , FilteredTextMenus AS (
-                    SELECT id_questionaryMenu, id_text, text
-                    FROM TextMenus
-                    WHERE rn = 1
-                )
-                SELECT 
-                    q.id_questions, 
-                    COALESCE(ftq.text, qt_default.text) as question_text, 
-                    COALESCE(ftm.text, tm_default.text) as menu_text,
-                    q.question_type,
-                    c.company_name
-                FROM questions q
-                INNER JOIN mapQuestions mq ON q.id_questions = mq.id_questions
-                INNER JOIN FilteredTextQuestions ftq ON mq.id_questions = ftq.id_questions
-                INNER JOIN questionaryMenu qm ON mq.id_questionaryMenu = qm.id_questionaryMenu
-                INNER JOIN FilteredTextMenus ftm ON qm.id_questionaryMenu = ftm.id_questionaryMenu
-                LEFT JOIN texts qt_default ON ftq.id_text = qt_default.id_text
-                LEFT JOIN texts tm_default ON ftm.id_text = tm_default.id_text
-                INNER JOIN questionaries qn ON qn.id_questionary = qm.id_questionary
-                INNER JOIN company c ON qn.company_code = c.company_code
-                WHERE qn.company_code = ?;
+                        q.id_questions, 
+                        COALESCE(ftq.text, qt_default.text) as question_text, 
+                        COALESCE(ftm.text, tm_default.text) as menu_text,
+                        q.question_type,
+                        c.company_name
+                    FROM questions q
+                    INNER JOIN mapQuestions mq ON q.id_questions = mq.id_questions
+                    INNER JOIN FilteredTextQuestions ftq ON mq.id_questions = ftq.id_questions
+                    INNER JOIN questionaryMenu qm ON mq.id_questionaryMenu = qm.id_questionaryMenu
+                    INNER JOIN FilteredTextMenus ftm ON qm.id_questionaryMenu = ftm.id_questionaryMenu
+                    LEFT JOIN texts qt_default ON ftq.id_text = qt_default.id_text
+                    LEFT JOIN texts tm_default ON ftm.id_text = tm_default.id_text
+                    INNER JOIN questionaries qn ON qn.id_questionary = qm.id_questionary
+                    INNER JOIN company c ON qn.company_code = c.company_code
+                    WHERE qn.company_code = ?;
+
             """
             cursor.execute(sql_query, (language_code,company_code))
             rows = cursor.fetchall()
