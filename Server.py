@@ -665,12 +665,12 @@ INNER JOIN questionaries qn ON qn.id_questionary = qm.id_questionary
 INNER JOIN company c ON qn.company_code = c.company_code
 WHERE qn.company_code = 'E73463259';
             """
-            cursor.execute(sql_query)
-            print(name_language,company_code)
-            rows = cursor.fetchall()
-            print(rows)
-            if not rows:
-                return jsonify({"error": sql_query}), 500
+            # cursor.execute(sql_query)
+            # print(name_language,company_code)
+            # rows = cursor.fetchall()
+            # print(rows)
+            # if not rows:
+            #     return jsonify({"error": sql_query}), 500
             # results = [
             #     {description[0]: row[i] for i, description in enumerate(cursor.description)}for row in rows
             # ]
