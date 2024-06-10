@@ -299,6 +299,7 @@ def get_image():
         #     return send_file(imagen_stream, mimetype='image/png')
         # else:
         #     return "Imagen no encontrada", 404
+        print(filename)
         if os.path.exists(filename):
             return send_file(filename, mimetype='image/jpg')
         else:
