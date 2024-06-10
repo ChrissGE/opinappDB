@@ -289,8 +289,8 @@ def get_image():
             query = "SELECT image_company FROM company WHERE company_code = %s"
             filename = f"r./imagenes/star.png"
 
-        cursor.execute(query, (id_image,))
-        row = cursor.fetchone()
+        # cursor.execute(query, (id_image,))
+        # row = cursor.fetchone()
         # if row and row[0]:
         #     # Convertir varbinary a bytes
         #     imagen_bytes = bytes(row[0])
