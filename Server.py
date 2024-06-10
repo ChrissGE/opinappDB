@@ -74,9 +74,9 @@ def getUser():
         if row is None:
             resultado = jsonify({'email': 'NOK'}), 200
         else:
-            resultado =  {'username':row.username,
-                            'email':row.email,
-                            'points':row.points}
+            resultado = {'username': row[1],  
+                         'email': row[0],  
+                         'points': row[2]} 
             resultado = jsonify(resultado), 200
         return resultado
     finally:
