@@ -802,7 +802,7 @@ def setReview():
         cursor.execute(insert_traces, (company_code, company_code))
         
         conn.commit()
-        calculate_score_perReview(id_review)
+        #calculate_score_perReview(id_review)
         return jsonify({"message": "Review creada exitosamente", "points_reward": points_reward})
     
     finally:
