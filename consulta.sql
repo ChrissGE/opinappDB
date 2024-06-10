@@ -57,4 +57,4 @@ LEFT JOIN texts qt_default ON ftq.id_text = qt_default.id_text
 LEFT JOIN texts tm_default ON ftm.id_text = tm_default.id_text
 INNER JOIN questionaries qn ON qn.id_questionary = qm.id_questionary
 INNER JOIN company c ON qn.company_code = c.company_code
-WHERE qn.company_code = 'U31477490';
+WHERE qn.company_code = 'E73463259';
