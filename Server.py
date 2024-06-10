@@ -9,7 +9,7 @@ nltk.download('universal_tagset')
 nltk.download('averaged_perceptron_tagger')
 nltk.download('vader_lexicon')
 nltk.download('punkt')
-import io
+import os
 import json
 import mysql.connector
 
@@ -283,16 +283,24 @@ def get_image():
         cursor = conn.cursor()
         if tipo == 'producto':
             query = "SELECT image_reward FROM rewards WHERE id_reward = %s"
+            filename = f"r./imagenes/star.png"
+
         elif tipo == 'company':
             query = "SELECT image_company FROM company WHERE company_code = %s"
+            filename = f"r./imagenes/star.png"
+
         cursor.execute(query, (id_image,))
         row = cursor.fetchone()
-        if row and row[0]:
-            # Convertir varbinary a bytes
-            imagen_bytes = bytes(row[0])
-            # Crear un stream de bytes
-            imagen_stream = io.BytesIO(imagen_bytes)
-            return send_file(imagen_stream, mimetype='image/jpg')
+        # if row and row[0]:
+        #     # Convertir varbinary a bytes
+        #     imagen_bytes = bytes(row[0])
+        #     # Crear un stream de bytes
+        #     imagen_stream = io.BytesIO(imagen_bytes)
+        #     return send_file(imagen_stream, mimetype='image/png')
+        # else:
+        #     return "Imagen no encontrada", 404
+        if os.path.exists(filename):
+            return send_file(filename, mimetype='image/jpg')
         else:
             return "Imagen no encontrada", 404
     finally:
