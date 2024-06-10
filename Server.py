@@ -275,7 +275,7 @@ def get_products():
 
 @app.route('/getImage', methods=['POST'])
 def get_image():
-    try: 
+    try:
         datos = request.json
         id_image = datos.get('id_image')
         tipo = datos.get('tipo')
@@ -283,10 +283,8 @@ def get_image():
         cursor = conn.cursor()
         if tipo == 'producto':
             query = "SELECT image_reward FROM rewards WHERE id_reward = %s"
-
         elif tipo == 'company':
             query = "SELECT image_company FROM company WHERE company_code = %s"
-            
         cursor.execute(query, (id_image,))
         row = cursor.fetchone()
         if row and row[0]:
@@ -294,12 +292,13 @@ def get_image():
             imagen_bytes = bytes(row[0])
             # Crear un stream de bytes
             imagen_stream = io.BytesIO(imagen_bytes)
-            return send_file(imagen_stream, mimetype='image/jpg') 
+            return send_file(imagen_stream, mimetype='image/jpg')
         else:
             return "Imagen no encontrada", 404
     finally:
         cursor.close()
         conn.close()
+
 
 
 
