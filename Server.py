@@ -312,9 +312,9 @@ def getQuestionary():
         name_language=datos.get('name_language')
 
         if name_language.lower()=='español':
-            language_code='ES'
+            language_code="ES"
         else:
-            language_code='EN'
+            language_code="EN"
 
         cursor = conn.cursor()
         try:
