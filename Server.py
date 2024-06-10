@@ -287,7 +287,7 @@ def get_image():
 
         elif tipo == 'company':
             query = "SELECT image_company FROM company WHERE company_code = %s"
-            filename = f"r./imagenes/star.png"
+            filename = f"r.//imagenes/star.png"
 
         # cursor.execute(query, (id_image,))
         # row = cursor.fetchone()
