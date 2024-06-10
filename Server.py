@@ -69,7 +69,7 @@ def getUser():
                     from users
                     where email = %s;
                     """
-        cursor.execute(query,email)
+        cursor.execute(query,(email,))
         row = cursor.fetchone()
         if row is None:
             resultado = jsonify({'email': 'NOK'}), 200
