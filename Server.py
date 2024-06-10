@@ -319,7 +319,6 @@ def getQuestionary():
         cursor = conn.cursor()
         try:
             sql_query = """
-              SET @language = %s;
                WITH RECURSIVE TextQuestions AS (
                     SELECT 
                         mtq.id_questions, 
@@ -327,9 +326,9 @@ def getQuestionary():
                         qt.text,
                         ROW_NUMBER() OVER (PARTITION BY mtq.id_questions ORDER BY 
                             CASE 
-                                WHEN  @language  THEN CASE WHEN l.name_language = 'ES' THEN 1 ELSE 2 END
-                                WHEN  @language  THEN CASE WHEN l.name_language = 'EN' THEN 1 ELSE 2 END
-                                WHEN  @language  THEN CASE WHEN l.name_language = 'PT' THEN 1 ELSE 2 END
+                                WHEN  %s  THEN CASE WHEN l.name_language = 'ES' THEN 1 ELSE 2 END
+                                WHEN  %s  THEN CASE WHEN l.name_language = 'EN' THEN 1 ELSE 2 END
+                                WHEN  %s  THEN CASE WHEN l.name_language = 'PT' THEN 1 ELSE 2 END
                                 ELSE 2
                             END) AS rn
                     FROM mapTextQuestions mtq
@@ -348,9 +347,9 @@ def getQuestionary():
                         tm.text,
                         ROW_NUMBER() OVER (PARTITION BY mtm.id_questionaryMenu ORDER BY 
                             CASE 
-                                WHEN  @language  THEN CASE WHEN l.name_language = 'ES' THEN 1 ELSE 2 END
-                                WHEN  @language  THEN CASE WHEN l.name_language = 'EN' THEN 1 ELSE 2 END
-                                WHEN  @language  THEN CASE WHEN l.name_language = 'PT' THEN 1 ELSE 2 END
+                                WHEN  %s  THEN CASE WHEN l.name_language = 'ES' THEN 1 ELSE 2 END
+                                WHEN  %s  THEN CASE WHEN l.name_language = 'EN' THEN 1 ELSE 2 END
+                                WHEN  %s  THEN CASE WHEN l.name_language = 'PT' THEN 1 ELSE 2 END
                                 ELSE 2
                             END) AS rn
                     FROM mapTextMenu mtm
@@ -380,7 +379,7 @@ def getQuestionary():
                 WHERE qn.company_code = %s;
 
             """
-            cursor.execute(sql_query, (language_code,company_code))
+            cursor.execute(sql_query, (language_code,language_code,language_code,language_code,language_code,language_code,company_code))
             print(language_code,company_code)
             rows = cursor.fetchall()
             print(rows)
