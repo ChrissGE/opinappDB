@@ -736,67 +736,75 @@ def setReview():
     try:
         conn = create_connection()
         datos = request.json
-        cursor = conn.cursor()
+        cursor = conn.cursor(dictionary=True)
         
         company_code = datos.get("company_code")
-
-        id_questionary_query = """select id_questionary,points_reward from questionaries where company_code= %s """
-        cursor.execute(id_questionary_query,company_code)
-        rows = cursor.fetchall()
-        id_questionary=rows[0].id_questionary
-        points_reward=rows[0].points_reward
-
         email = datos.get("email")
         
-        insert = """
-        insert into reviews (id_questionary,email) values (%s,%s)
-        """
-        cursor.execute(insert,(id_questionary,email))
+        # Obtener id_questionary y points_reward
+        id_questionary_query = """SELECT id_questionary, points_reward FROM questionaries WHERE company_code = %s"""
+        cursor.execute(id_questionary_query, (company_code,))
+        rows = cursor.fetchall()
         
-        id_review_query = """select id_review from reviews where id_review =  (select max(id_review) from reviews)"""
+        if not rows:
+            return jsonify({"error": "Company code not found"}), 400
+        
+        id_questionary = rows[0]['id_questionary']
+        points_reward = rows[0]['points_reward']
+        
+        # Insertar la review
+        insert_review = """INSERT INTO reviews (id_questionary, email) VALUES (%s, %s)"""
+        cursor.execute(insert_review, (id_questionary, email))
+        
+        # Obtener el id_review recién insertado
+        id_review_query = """SELECT id_review FROM reviews WHERE id_review = (SELECT MAX(id_review) FROM reviews)"""
         cursor.execute(id_review_query)
         rows = cursor.fetchall()
-        id_review=rows[0].id_review
-
-        preguntas = datos.get("questions",[])
+        id_review = rows[0]['id_review']
+        
+        preguntas = datos.get("questions", [])
         
         for question in preguntas:
             id_pregunta = question.get("id_question")
-            print(id_pregunta)
-            id_questionaryMenu_query="""
-                                        select * 
-                                        from mapQuestions mq
-                                        inner join questions qs on qs.id_questions=mq.id_questions
-                                        inner join questionaryMenu qm on qm.id_questionaryMenu=mq.id_questionaryMenu
-                                        inner join questionaries q on q.id_questionary=qm.id_questionary
-                                        where mq.id_questions=%s and qm.id_questionary=%s
-                                    """
-            cursor.execute(id_questionaryMenu_query,(id_pregunta,id_questionary))
+            respuesta = question.get("respuesta")
+            
+            id_questionaryMenu_query = """
+                SELECT qm.id_questionaryMenu, qs.question_type 
+                FROM mapQuestions mq
+                INNER JOIN questions qs ON qs.id_questions = mq.id_questions
+                INNER JOIN questionaryMenu qm ON qm.id_questionaryMenu = mq.id_questionaryMenu
+                INNER JOIN questionaries q ON q.id_questionary = qm.id_questionary
+                WHERE mq.id_questions = %s AND qm.id_questionary = %s
+            """
+            cursor.execute(id_questionaryMenu_query, (id_pregunta, id_questionary))
             rows = cursor.fetchall()
+            
             if rows:
-                id_questionaryMenu=rows[0].id_questionaryMenu
-                print(id_questionaryMenu)
-                respuesta = question.get("respuesta")
-                type=rows[0].question_type
-                if type=='Yes and no':
-                    insert = """insert into answer (id_questions,id_questionaryMenu,id_review,binary_answer) values (%s,%s,%s,%s)"""
+                id_questionaryMenu = rows[0]['id_questionaryMenu']
+                question_type = rows[0]['question_type']
+                
+                if question_type == 'Yes and no':
+                    insert_answer = """INSERT INTO answer (id_questions, id_questionaryMenu, id_review, binary_answer) VALUES (%s, %s, %s, %s)"""
                 else:
-                    insert = """insert into answer (id_questions,id_questionaryMenu,id_review,text) values (%s,%s,%s,%s)"""
+                    insert_answer = """INSERT INTO answer (id_questions, id_questionaryMenu, id_review, text) VALUES (%s, %s, %s, %s)"""
                     score = analizarTexto(respuesta)
-                    insert_score = """insert into scoring_per_map_review(id_review,id_questionaryMenu,mark) values(%s,%s,%s)"""
-                    cursor.execute(insert_score,(id_review,id_questionaryMenu,score)) 
-                    print(insert)
-                cursor.execute(insert,(id_pregunta,id_questionaryMenu,id_review,respuesta))
+                    insert_score = """INSERT INTO scoring_per_map_review (id_review, id_questionaryMenu, mark) VALUES (%s, %s, %s)"""
+                    cursor.execute(insert_score, (id_review, id_questionaryMenu, score))
+                
+                cursor.execute(insert_answer, (id_pregunta, id_questionaryMenu, id_review, respuesta))
         
-        insert_traces= """if not exists (select 1 from traces where company_code like %s)
-                            begin 
-                            insert into traces values(%s);
-                            end"""
-        cursor.execute(insert_traces,(company_code,company_code))
+        # Insertar en la tabla traces si no existe
+        insert_traces = """
+            INSERT INTO traces (company_code)
+            SELECT %s
+            WHERE NOT EXISTS (SELECT 1 FROM traces WHERE company_code = %s)
+        """
+        cursor.execute(insert_traces, (company_code, company_code))
         
         conn.commit()
         calculate_score_perReview(id_review)
-        return jsonify({"message": "review creada exitosamente","points_reward":points_reward})
+        return jsonify({"message": "Review creada exitosamente", "points_reward": points_reward})
+    
     finally:
         cursor.close()
         conn.close()
