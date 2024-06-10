@@ -1,3 +1,5 @@
+use opinapp
+
 DROP TABLE IF EXISTS map_global_scorings;
 DROP TABLE IF EXISTS global_scorings_value;
 DROP TABLE IF EXISTS traces;
