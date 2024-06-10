@@ -1,7 +1,7 @@
 DELIMITER //
 
 CREATE TRIGGER trg_insertar_ticket 
-INSTEAD OF INSERT ON ticket
+BEFORE OF INSERT ON ticket
 FOR EACH ROW
 BEGIN
     DECLARE points_act INT;
